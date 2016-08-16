@@ -20,7 +20,7 @@ pub trait ApproxEq: Sized {
     type Epsilon: NumCast + Float;
 
     fn approx_epsilon() -> Self::Epsilon {
-        cast(1.0e-5f64).unwrap()
+        cast(1.0e-10f64).unwrap()
     }
 
     fn approx_eq(&self, other: &Self) -> bool {
@@ -32,9 +32,13 @@ pub trait ApproxEq: Sized {
 
 
 macro_rules! approx_float(
-    ($S:ident) => (
+    ($S:ident, $eps:expr) => (
         impl ApproxEq for $S {
             type Epsilon = $S;
+
+            fn approx_epsilon() -> Self::Epsilon {
+                $eps
+            }
 
              #[inline]
             fn approx_eq_eps(&self, other: &$S, epsilon: &$S) -> bool {
@@ -44,8 +48,8 @@ macro_rules! approx_float(
     )
 );
 
-approx_float!(f32);
-approx_float!(f64);
+approx_float!(f32, 1e-10);
+approx_float!(f64, 1e-20);
 
 #[macro_export]
 macro_rules! assert_approx_eq_eps(
